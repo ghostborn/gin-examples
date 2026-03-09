@@ -156,3 +156,6 @@ func main() {
 	log.Println("Server running at http://localhost:8080")
 	r.Run(":8080")
 }
+
+// export GITHUB_CLIENT_ID="Ov23licxEOdBerK2dJUC"
+// export GITHUB_CLIENT_SECRET="4d6542799c61ff5a21dc04c66c38b6a69c41e9d7"

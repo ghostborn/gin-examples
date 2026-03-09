@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/ratelimit"
 )
@@ -21,9 +22,30 @@ func setupLogging() {
 }
 
 func leakBucket() gin.HandlerFunc {
-	prev := time.Now	// 记录上一次请求的时间，初始为程序启动时
+	prev := time.Now() // 记录上一次请求的时间，初始为程序启动时
 	return func(ctx *gin.Context) {
 		now := limit.Take()
-		
+		log.Print(color.CyanString("%v", now.Sub(prev)))
+		prev = now
 	}
+}
+
+func ginRun(rps int) {
+	limit = ratelimit.New(rps)
+	app := gin.Default()
+	app.Use(leakBucket())
+
+	app.GET("/rate", func(ctx *gin.Context) {
+		ctx.JSON(200, "rate limiting test")
+	})
+
+	log.Print(color.CyanString("Current Rate Limit: %v requests/s", rps))
+	_ = app.Run(":8080")
+
+}
+
+func main() {
+	setupLogging()
+	flag.Parse()
+	ginRun(*rps)
 }
